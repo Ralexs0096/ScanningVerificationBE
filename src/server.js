@@ -19,7 +19,9 @@ class Server {
   }
 
   listen() {
-
+    this.app.listen(process.env.SERVER_PORT, () => {
+      console.log('Running on port 5000');
+    })
   }
 
 }
