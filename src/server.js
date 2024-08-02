@@ -7,6 +7,8 @@ class Server {
     this.port = process.env.SERVER_PORT ?? 5000
 
     this.dbConnection()
+    this.middleware()
+    this.routes()
   }
 
   async dbConnection() {
@@ -15,7 +17,8 @@ class Server {
   }
 
   middleware() {
-
+    this.app.use(express.json())
+    this.app.use(express.urlencoded({ extended: true }))
   }
 
   routes() {
