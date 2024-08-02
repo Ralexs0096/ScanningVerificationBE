@@ -1,5 +1,6 @@
 import express from 'express'
 import { createConnection } from './config/db/connection.js'
+import Routes from './routes/index.js'
 
 class Server {
   constructor() {
@@ -22,7 +23,9 @@ class Server {
   }
 
   routes() {
-
+    Routes.forEach(({ path, route }) => {
+      this.app.use(path, route)
+    })
   }
 
   listen() {
