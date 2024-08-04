@@ -3,14 +3,27 @@ import { getAllUsersQuery } from "../config/queries/users.js";
 
 export const getAllUsers = async (_, res) => {
   try {
-
     const connection = await createConnection()
 
-    const [results] = await connection.query(getAllUsersQuery);
+    if (connection) {
+      const [results] = await connection.query(getAllUsersQuery);
 
-    res.json(results)
+      if (results.length > 0) {
+        return res.status(204)
+      }
+
+      return res.json(results)
+    }
+
+    return res.status(502).json({
+      code: "connectionError",
+      message: "Connection could not be established"
+    })
 
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      code: "unknown",
+      message: "Something went wrong"
+    })
   }
 }
