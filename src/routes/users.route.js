@@ -1,9 +1,8 @@
 import { Router } from 'express'
+import { getAllUsers } from '../controllers/users.controller.js'
 
 const router = Router()
 
-router.get('/', () => {
-  console.log("users");
-})
+router.get('/', getAllUsers)
 
 export default router
