@@ -7,14 +7,8 @@ class Server {
     this.app = express()
     this.port = process.env.SERVER_PORT ?? 5000
 
-    this.dbConnection()
     this.middleware()
     this.routes()
-  }
-
-  async dbConnection() {
-    await createConnection()
-    console.log("Database is connected...");
   }
 
   middleware() {
@@ -35,7 +29,7 @@ class Server {
   }
 
   listen() {
-    this.app.listen(process.env.SERVER_PORT, () => {
+    this.app.listen(this.port, () => {
       console.log('Running on port 5000');
     })
   }
