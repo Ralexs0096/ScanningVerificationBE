@@ -48,10 +48,23 @@ export const getUserById = async (req, res) => {
         code: "connectionError",
         message: "Connection could not be established"
       })
-
     }
 
-    const [results] = await connection.query(getUserByIdQuery(userId));
+    /**
+     * The user Id is actually the bar code of a `empleado` carnet.
+     *  this code contains the following structure:
+     * 
+     *  6 first characters are the `codigo_emp`
+     *  2 last characters are the `codigo_ec`
+     * 
+     * e.g. 086197 - 01
+     * 
+     * check the `tb_maestro_empleados` table for reference
+     */
+    const codigoEmp = userId.slice(0, 6)
+    const codigoEc = userId.slice(6)
+
+    const [results] = await connection.query(getUserByIdQuery(codigoEmp, codigoEc));
 
     if (results.length === 0) {
       return res.status(200).json({
