@@ -1,2 +1,2 @@
 
-export const getAllAreasQuery = `SELECT * FROM tb_area `
+export const getAllAreasQuery = `SELECT codigo_are, descripcion_are FROM tb_area `
