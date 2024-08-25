@@ -30,15 +30,13 @@ export const verifyCodesByArea = async (req, res) => {
       [area, userCodes]
     );
 
-    if (results.length === 0) {
-      return res.status(204)
-    }
-
     const response = userCodes.map((code) => ({ code, belongsToThisArea: false }))
 
-    for (const { codigo_emp } of results) {
-      const index = response.findIndex(({ code }) => code === codigo_emp)
-      response[index].belongsToThisArea = true
+    if (results.length > 0) {
+      for (const { codigo_emp } of results) {
+        const index = response.findIndex(({ code }) => code === codigo_emp)
+        response[index].belongsToThisArea = true
+      }
     }
 
     res.json(response)
