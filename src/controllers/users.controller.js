@@ -62,9 +62,8 @@ export const getUserById = async (req, res) => {
      * check the `tb_maestro_empleados` table for reference
      */
     const codigoEmp = userId.slice(0, 6)
-    const codigoEc = userId.slice(6)
 
-    const [results] = await connection.query(getUserByIdQuery(codigoEmp, codigoEc));
+    const [results] = await connection.query(getUserByIdQuery(codigoEmp));
 
     if (results.length === 0) {
       return res.status(200).json({
