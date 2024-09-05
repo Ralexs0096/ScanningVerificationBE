@@ -22,15 +22,27 @@ export const verifyCodesByArea = async (req, res) => {
         code: "connectionError",
         message: "Connection could not be established"
       })
-
     }
+
+    /**
+     * The user Id is actually the bar code of a `empleado` carnet.
+     *  this code contains the following structure:
+     * 
+     *  6 first characters are the `codigo_emp`
+     *  2 last characters are the `codigo_ec`
+     * 
+     * e.g. 086197 - 01
+     * 
+     * check the `tb_maestro_empleados` table for reference
+     */
+    const codes = userCodes.map((userCode) => userCode.slice(0, 6))
 
     const [results] = await connection.query(
       verifyCodesByAreaQuery,
-      [area, userCodes]
+      [area, codes]
     );
 
-    const response = userCodes.map((code) => ({ code, belongsToThisArea: false }))
+    const response = codes.map((code) => ({ code, belongsToThisArea: false }))
 
     if (results.length > 0) {
       for (const { codigo_emp } of results) {
