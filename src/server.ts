@@ -1,5 +1,5 @@
 import express, { Application, Request, Response } from 'express';
-import { envs } from './envs';
+import { envs } from './config/envs';
 // import Routes from './routes/index.ts';
 
 class Server {
