@@ -1,21 +1,24 @@
-import { createConnection } from '../config/db/connection.js';
-import { getAllAreasQuery } from '../config/queries/areas.js';
+import { Request, Response } from 'express';
+import { createConnection } from '../config/db/connection';
+import { getAllAreasQuery } from '../config/queries/areas';
+import { RowDataPacket } from 'mysql2';
 
-export const getAllAreas = async (_, res) => {
+export const getAllAreas = async (_: Request, res: Response) => {
   try {
     const connection = await createConnection();
 
     if (!connection) {
-      return res.status(502).json({
+      res.status(502).json({
         code: 'connectionError',
         message: 'Connection could not be established'
       });
+      return;
     }
 
-    const [results] = await connection.query(getAllAreasQuery);
+    const [results] = await connection.query<RowDataPacket[]>(getAllAreasQuery);
 
     if (results.length === 0) {
-      return res.status(204);
+      res.status(204);
     }
 
     res.json(
@@ -28,7 +31,7 @@ export const getAllAreas = async (_, res) => {
     await connection.end();
   } catch (error) {
     console.log({ error });
-    return res.status(500).json({
+    res.status(500).json({
       code: 'unknown',
       message: 'Something went wrong'
     });

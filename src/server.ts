@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import { envs } from './config/envs';
-// import Routes from './routes/index.ts';
+import Routes from './routes';
 
 class Server {
   private app: Application;
@@ -26,9 +26,9 @@ class Server {
       });
     });
 
-    // Routes.forEach(({ path, route }) => {
-    //   this.app.use(path, route);
-    // });
+    Routes.forEach(({ path, route }) => {
+      this.app.use(path, route);
+    });
   }
 
   listen() {

@@ -9,8 +9,8 @@ export const createConnection = async () => {
       password: process.env.DB_PASSWORD
     });
 
-    return connection
+    return connection;
   } catch (error) {
     console.log(error);
   }
-}
+};
