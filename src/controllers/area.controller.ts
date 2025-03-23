@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import { createConnection } from '../config/db/connection';
-import { getAllAreasQuery } from '../config/queries/areas';
-import { RowDataPacket } from 'mysql2';
+import { tbArea } from '../config/db/schema';
 
 export const getAllAreas = async (_: Request, res: Response) => {
   try {
-    const connection = await createConnection();
+    const db = await createConnection();
 
-    if (!connection) {
+    if (!db) {
       res.status(502).json({
         code: 'connectionError',
         message: 'Connection could not be established'
@@ -15,20 +14,18 @@ export const getAllAreas = async (_: Request, res: Response) => {
       return;
     }
 
-    const [results] = await connection.query<RowDataPacket[]>(getAllAreasQuery);
+    const results = await db.select().from(tbArea);
 
     if (results.length === 0) {
       res.status(204);
     }
 
     res.json(
-      results.map(({ codigo_are, descripcion_are }) => ({
-        areaId: codigo_are,
-        name: descripcion_are
+      results.map(({ codigoAre, descripcionAre }) => ({
+        areaId: codigoAre,
+        name: descripcionAre
       }))
     );
-
-    await connection.end();
   } catch (error) {
     console.log({ error });
     res.status(500).json({
