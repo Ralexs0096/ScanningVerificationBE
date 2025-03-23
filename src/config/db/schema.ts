@@ -44,7 +44,7 @@ export const tbMaestroEmpleados = mysqlTable('tb_maestro_empleados', {
   codigoDep: varchar('codigo_dep', { length: 3 }),
   departamento: varchar('departamento', { length: 20 }),
   codigoMun: varchar('codigo_mun', { length: 3 }),
-  municipio: varchar('municipio', { length: 20 }),
+  municipio: varchar('municipio', { length: 30 }),
   direccion: text('direccion'),
   mNombre1: varchar('m_nombre1', { length: 20 }),
   mNombre2: varchar('m_nombre2', { length: 20 }),
