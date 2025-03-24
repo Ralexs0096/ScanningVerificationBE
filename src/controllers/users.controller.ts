@@ -1,19 +1,26 @@
-import { RowDataPacket } from 'mysql2';
 import { Request, Response } from 'express';
 import { createConnection } from '../config/db/connection';
 import { getAllUsersQuery, getUserByIdQuery } from '../config/queries/users';
+import { tbMaestroEmpleados } from '../config/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const getAllUsers = async (_: Request, res: Response) => {
   try {
-    const connection = await createConnection();
-    if (!connection) {
+    const db = await createConnection();
+    if (!db) {
       res.status(502).json({
         code: 'connectionError',
         message: 'Connection could not be established'
       });
       return;
     }
-    const [results] = await connection.query<RowDataPacket[]>(getAllUsersQuery);
+
+    const results = await db
+      .select({
+        nombre_completo: tbMaestroEmpleados.nombreCompleto,
+        cedula_id: tbMaestroEmpleados.cedulaId
+      })
+      .from(tbMaestroEmpleados);
 
     if (results.length === 0) {
       res.status(204);
@@ -21,7 +28,6 @@ export const getAllUsers = async (_: Request, res: Response) => {
     }
 
     res.json(results);
-    await connection.end();
   } catch (error) {
     console.log({ error });
     res.status(500).json({
@@ -43,9 +49,9 @@ export const getUserById = async (req: Request, res: Response) => {
       return;
     }
 
-    const connection = await createConnection();
+    const db = await createConnection();
 
-    if (!connection) {
+    if (!db) {
       res.status(502).json({
         code: 'connectionError',
         message: 'Connection could not be established'
@@ -66,9 +72,13 @@ export const getUserById = async (req: Request, res: Response) => {
      */
     const codigoEmp = userId.slice(0, 6);
 
-    const [results] = await connection.query<RowDataPacket[]>(
-      getUserByIdQuery(codigoEmp)
-    );
+    const results = await db
+      .select({
+        nombre_completo: tbMaestroEmpleados.nombreCompleto,
+        cedula_id: tbMaestroEmpleados.cedulaId
+      })
+      .from(tbMaestroEmpleados)
+      .where(eq(tbMaestroEmpleados.codigoEmp, codigoEmp));
 
     if (results.length === 0) {
       res.status(200).json({
@@ -78,7 +88,6 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 
     res.json(results);
-    await connection.end();
   } catch (error) {
     console.log({ error });
     res.status(500).json({
