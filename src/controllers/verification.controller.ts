@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
 import { createConnection } from '../config/db/connection';
 import { verifyCodesByAreaQuery } from '../config/queries/verification';
-import { RowDataPacket } from 'mysql2';
-
-// for testing purposes
-// ['046259', '051718', '066034', '066577', '069121']
+import { tbMaestroEmpleados } from '../config/db/schema';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export const verifyCodesByArea = async (req: Request, res: Response) => {
   try {
@@ -18,9 +16,9 @@ export const verifyCodesByArea = async (req: Request, res: Response) => {
       return;
     }
 
-    const connection = await createConnection();
+    const db = await createConnection();
 
-    if (!connection) {
+    if (!db) {
       res.status(502).json({
         code: 'connectionError',
         message: 'Connection could not be established'
@@ -41,10 +39,19 @@ export const verifyCodesByArea = async (req: Request, res: Response) => {
      */
     const codes = userCodes.map((userCode: string) => userCode.slice(0, 6));
 
-    const [results] = await connection.query<RowDataPacket[]>(
-      verifyCodesByAreaQuery,
-      [area, codes]
-    );
+    const results = await db
+      .select({
+        codigoEmp: tbMaestroEmpleados.codigoEmp,
+        cedulaId: tbMaestroEmpleados.cedulaId,
+        nombreCompleto: tbMaestroEmpleados.nombreCompleto
+      })
+      .from(tbMaestroEmpleados)
+      .where(
+        and(
+          eq(tbMaestroEmpleados.codigoAre, area),
+          inArray(tbMaestroEmpleados.codigoEmp, codes)
+        )
+      );
 
     const response = codes.map((code: string) => ({
       code,
@@ -52,16 +59,15 @@ export const verifyCodesByArea = async (req: Request, res: Response) => {
     }));
 
     if (results.length > 0) {
-      for (const { codigo_emp } of results) {
+      for (const { codigoEmp } of results) {
         const index = response.findIndex(
-          ({ code }: { code: string }) => code === codigo_emp
+          ({ code }: { code: string }) => code === codigoEmp
         );
         response[index].belongsToThisArea = true;
       }
     }
 
     res.json(response);
-    await connection.end();
   } catch (error) {
     console.log({ error });
     res.status(500).json({
